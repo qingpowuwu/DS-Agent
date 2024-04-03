@@ -37,7 +37,7 @@ CASE_PROMPT = """[Task]
 ```
 """
 
-RAW_CASE_PROMPT = """Here are some relevant textual insights that can hel you solve the machine learning task:
+RAW_CASE_PROMPT = """Here are some relevant textual insights that can help you solve the machine learning task:
 {} 
 Now please solve the following machine learning task based on the textual insights above.
 [Task]
