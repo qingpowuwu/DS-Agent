@@ -1,7 +1,6 @@
 ## 第1个文件 similarity_ranking.json
 
-这里 similarity_ranking.json 列出了一系列任务 (一共18个)，并为每个任务提供了一个相似任务的列表。
-这个列表可能是基于某种相似性度量（例如，基于任务描述、数据特征或已知解决方案的相似性）来排名的。
+这里 similarity_ranking.json 列出了当下任务(e.g, "smoker-status") 和一系列任务 (一共12个) 之间相似度的排名, 这个列表可能是基于某种相似性度量（例如，基于任务描述、数据特征或已知解决方案的相似性）来排名的:
 ```
 {
     "smoker-status": [
@@ -20,6 +19,29 @@
         "feedback",
 ...
     ],
+```
+
+这一系列任务都可以在 ./experience_replay 文件夹下面的其对应的代码, 例如：
+```
+-- deployment/
+    --- config/
+    --- experience_replay/
+        |---- enzyme-substrate.py
+        |---- spaceship-titanic.py
+        |---- airline-reviews.py
+        |---- ethanol-concentration.py
+        |---- chatgpt-prompt.py
+        |---- handwriting.py
+        |---- wild-blueberry-yield.py
+        |---- media-campaign-cost.py
+        |---- textual-entailment.py
+        |---- feedback.py
+        |---- ett-m2.py
+        |---- ili.py
+-- development/
+-- figures/
+
+./experience_replay/enzyme-substrate.py,
 ```
 
 ## 第2个文件 heterogenous_similarity_ranking.json
