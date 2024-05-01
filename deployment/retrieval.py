@@ -35,7 +35,7 @@ class RetrievalDatabase:
                 self.case_bank.append(self.query_prompt + file.read()) # 把每个 case 的内容加上 query_prompt 后加入 case_bank
         # print('len(self.case_bank) = ', len(self.case_bank)) # 12
         
-        # (2) 把 x_inputs 做 embedding: i.e, 把 self.case_bank 中的每个 case 用 tokenizer 处理后，得到 x_inputs
+        # (2) 把 x_inputs(i.e, research problem) 做 embedding: i.e, 把 self.case_bank 中的每个 case 用 tokenizer 处理后，得到 x_inputs
         # Construct Embedding Database
         x_inputs = self.tokenizer(
             self.case_bank,
@@ -97,7 +97,7 @@ class RetrievalDatabase:
 if __name__ == '__main__':
     rb = RetrievalDatabase()
     ranking_dict = {}
-    # 遍历 DEPLOYMENT_TASKS 中的 task, 用 retrieve_case 方法检索每个 task 的相似 case
+    # 遍历 DEPLOYMENT_TASKS 中的 task, 用 rb.retrieve_case 方法检索出每个 task 的相似 case: ranking_dict[task] 
     for task in DEPLOYMENT_TASKS: # smoker-status
         filename = f"../development/MLAgentBench/benchmarks/{task}/scripts/research_problem.txt"
         with open(filename) as file:
@@ -110,3 +110,25 @@ if __name__ == '__main__':
         print("Writing the ranking results to ./config/similarity_ranking.json")
         json.dump(ranking_dict, json_file, indent=4)
         
+#%%
+
+# 总结：这个 retrieval.py 文件通过遍历 DEPLOYMENT_TASKS 中的 task, 用 rb.retrieve_case 方法检索出每个 task 的相似 case, 并把结果写入 ./config/similarity_ranking.json 文件中
+# 总结：retrieval_print.py 文件主要是 打印的时候加上了一些颜色，但是功能和 retrieval.py 文件一样
+
+# Q1: with torch.no_grad():
+        #     x_outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
+        #     x_outputs = x_outputs.last_hidden_state[:, 0]
+        #     x_embedding = torch.nn.functional.normalize(x_outputs, p=2, dim=1)
+        # self.embedding_bank = x_embedding 
+# 为什么要做这一步？为什么能直接用 x_inputs 计算 similarity?
+# A: 在这段代码中,需要通过预训练的语言模型来获取文本的语义embedding向量表示,而不能直接使用x_inputs计算相似度,原因如下:
+
+    # 1.x_inputs只包含了文本的token id和注意力掩码信息,是对原始文本的一种表面编码,没有捕获文本的语义信息。
+
+    # 2.通过预训练语言模型(self.model)对x_inputs进行编码,可以获取模型最后一层的隐藏状态输出x_outputs,这个输出已经融合了模型对文本的语义理解。
+
+    # 3.取x_outputs的第一个向量(x_outputs[:, 0])作为文本的embedding向量,是因为transformer模型中的第一个向量通常被视为整个序列的aggregate representation。
+
+    # 4.对x_outputs[:, 0]进行L2归一化,可以获得标准化的embedding向量x_embedding,方便后续计算余弦相似度。
+
+    # 5.self.embedding_bank存储了所有案例文本的embedding向量,用于后续给定查询时进行相似度计算和案例检索
