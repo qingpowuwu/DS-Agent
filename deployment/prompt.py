@@ -1,8 +1,12 @@
 import json
 import random
 
-RP_PATH = "./benchmarks/{}/scripts/research_problem.txt"
-PYTHON_PATH = "./benchmarks/{}/env/train.py"
+#%% 为了统一，我把 RP_PATH & PYTHON_PATH 都改成使用 ../development/MLAgentBench/benchmarks/ 这个路径下的文件
+
+# RP_PATH = "./benchmarks/{}/scripts/research_problem.txt" # research problem 的 path
+# PYTHON_PATH = "./benchmarks/{}/env/train.py"
+RP_PATH = "../development/MLAgentBench/benchmarks/{}/scripts/research_problem.txt" # research problem 的 path
+PYTHON_PATH = "../development/MLAgentBench/benchmarks/{}/env/train.py"             # python code 的 path
 CASE_PATH = "./experience_replay/{}.py"
 
 ZERO_SHOT_PROMPT = """
@@ -37,7 +41,7 @@ CASE_PROMPT = """[Task]
 ```
 """
 
-RAW_CASE_PROMPT = """Here are some relevant textual insights that can hel you solve the machine learning task:
+RAW_CASE_PROMPT = """Here are some relevant textual insights that can help you solve the machine learning task:
 {} 
 Now please solve the following machine learning task based on the textual insights above.
 [Task]
@@ -50,8 +54,8 @@ Start the python code with "```python". Please ensure the completeness of the co
 """
 
 def get_task(task):
-    rp_path = RP_PATH.format(task)
-    python_path = PYTHON_PATH.format(task)
+    rp_path = RP_PATH.format(task) # research problem 的 path
+    python_path = PYTHON_PATH.format(task) # python code 的 path
     with open(rp_path) as file:
         rp = file.read()
     with open(python_path) as file:
@@ -97,5 +101,6 @@ def get_prompt(task, context_num=0, strategy=None, raw=False):
         
 
 if __name__ == '__main__':
-    p = get_prompt("cirrhosis-outcomes", context_num=1, strategy="retrieval", raw_case=True)
-    print(p)
+    prompt = get_prompt(task="cirrhosis-outcomes", context_num=1, strategy="retrieval", raw=True)
+    # def get_prompt(task, context_num=0, strategy=None, raw=False):
+    print('prompt =', prompt)
