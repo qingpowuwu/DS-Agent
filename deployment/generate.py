@@ -78,12 +78,8 @@ def log_to_file(log_file, prompt, completion):
 
 if __name__ == '__main__':
     args = get_args()
-    
-    # Load Model
-    if "mixtral" in args.llm:
-        openai.api_base = "http://localhost:8000/v1"
         
-    # Load Tasks
+    # Load Tasks: 把 全局变量_list 保存 进来 
     if args.task == "all":
         tasks_to_solve = DEPLOYMENT_TASKS
     else:
@@ -92,14 +88,15 @@ if __name__ == '__main__':
     
     # Pathname
     prefix = f"{args.llm}_{args.retrieval}_{args.shot}" if not args.raw else f"{args.llm}_{args.retrieval}_{args.shot}_raw"
+    # prefix 前缀: gpt-3.5-turbo-16k_True_1
     
     # Create the path for generation results
-    pathname = f"./codes/{prefix}"
+    pathname = f"./codes/{prefix}"                  # ./codes/gpt-3.5-turbo-16k_True_1
     if not os.path.exists(pathname):
         os.makedirs(pathname)
        
     # Create Finetune Logs
-    finetune_dir = f"./codes/{prefix}/finetune_log"
+    finetune_dir = f"./codes/{prefix}/finetune_log" # ./codes/gpt-3.5-turbo-16k_True_1/finetune_log
     if not os.path.exists(finetune_dir):
         os.makedirs(finetune_dir)
     
@@ -118,4 +115,11 @@ if __name__ == '__main__':
             with open(filename, "wt") as file:
                 file.write(response)
             
-        
+
+# 我的理解是这个原本的 generate.py 运行了之后会在
+# temp_pathname = f"{pathname}/{task}"         # ./codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation
+    # 这个路径下生成一个 train_{idx}.py 文件,文件内容是 response
+# temp_fineturnedir = f"{finetune_dir}/{task}" # ./codes/gpt-3.5-turbo-16k_False_0/finetune_log/detect-ai-generation
+    # 这个路径下生成一个 {idx}.txt 文件,文件内容是 prompt 和 response
+# log_folder = f"./log_prompt_response/{task}" # ./log_prompt_response/detect-ai-generation
+    # 这个路径下生成一个 {idx}.log 文件,文件内容是 task, idx, prompt 和 response
