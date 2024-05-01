@@ -33,8 +33,14 @@ Run DS-Agent for development tasks with the following command:
 
 ```shell
 cd development/MLAgentBench
-python runner.py --task feedbackv2 --llm-name gpt-3.5-turbo-16k --edit-script-llm-name gpt-3.5-turbo-16k
+python runner.py --task feedback --llm-name gpt-3.5-turbo-16k --edit-script-llm-name gpt-3.5-turbo-16k
 ```
+
+注意！因为我们在 MLAgentBench 目录，直接跑源代码会有2个问题：
+* 对于 MLAgrentBench 文件夹下面的 .py 文件，如果使用 from .MLAgentBench.A import A_1 会报错 -> 要改成 from A import A_1
+* 对于 agents 文件夹下的 .py 文件，
+  * 如果使用 from MLAgentBench.A import A_1 会报错 -> 要改成 from A import A_1 （这个和上面一点一样，因为我们其实在 MLAgentBench 这个目录）
+  * 如果使用 from A import A_1 (这里 A 在 agents 文件夹下) 也会报错 -> 要改成 from agents.A import A_1，因为我们其实在 MLAgentBench 这个目录）
 
 During execution, logs and intermediate solution files will be saved in logs/ and workspace/. 
 
