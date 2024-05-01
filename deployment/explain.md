@@ -31,6 +31,40 @@
 
 4. 最后,将 ranking_dict 写入 JSON 文件 ./config/similaity_ranking.json。
 
+## execution.py
+
+```
+script_path = os.path.join(workspace_task_dir, script_name) # 想要执行的 ·python 脚本的地址
+cmd = f"CUDA_VISIBLE_DEVICES={device} python -u {script_name}" # 想要执行的 command line, ex: # CUDA_VISIBLE_DEVICES=0 python -u prompt.py
+# (1) 使用 subprocess.Popen 来执行 cmd 命令
+process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, cwd=workspace_task_dir)
+# (2) 使用 selectors 模块来监视脚本的标准输出和标准错误流,以实时捕获和打印输出。它还会将输出存储在 stdout_lines 和 stderr_lines 列表中。
+stdout_lines = []
+stderr_lines = []
+
+selector = selectors.DefaultSelector()
+selector.register(process.stdout, selectors.EVENT_READ)
+selector.register(process.stderr, selectors.EVENT_READ)
+...
+
+# (3) 在脚本执行完毕后,函数会检查返回码 return_code。
+if return_code != 0:
+    observation = "".join(stderr_lines)
+else:
+    observation = "".join(stdout_lines)
+if observation == "" and return_code == 0:
+    # printed to stderr only
+    observation = "".join(stderr_lines)
+
+return "The script has been executed. Here is the output:\n" + observation
+```
+
+* 总结：execution.py 文件中定义了一个名为 execute_script 的函数,用于在指定的工作目录中执行一个 Python 脚本。
+* execute_script 函数接受3个参数: script_name, workspace_task_dir, device
+* 如果这个 .py 文件不存在,则会抛出异常 "The file {script_name} does not exist."
+* 如果执行成功,则返回 "The script has been executed. Here is the output:\n" + observation
+* 如果执行失败,则返回异常 "Something went wrong in executing {script_name}: {e}. Please check if it is ready to be executed."
+
 总的来说,这段代码构建了一个基于语义嵌入的案例检索系统。它利用预训练的语言模型来计算文本嵌入(self.embedding),并根据嵌入向量之间的相似度检索最相关的开发任务案例(similarity = (x_embedding @ self.embedding_bank.T).squeeze())。这种检索方法可以帮助找到与给定的部署任务最相关的开发案例,从而为部署任务提供有用的参考和指导。
 
 生成的 similaity_ranking.json 文件包含了每个部署任务及其最相关的开发任务案例排名,可用于后续的分析和应用。
