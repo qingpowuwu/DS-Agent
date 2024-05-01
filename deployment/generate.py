@@ -86,33 +86,36 @@ if __name__ == '__main__':
         assert args.task in DEPLOYMENT_TASKS
         tasks_to_solve = [args.task]
     
-    # Pathname
+    # (0)Pathname
     prefix = f"{args.llm}_{args.retrieval}_{args.shot}" if not args.raw else f"{args.llm}_{args.retrieval}_{args.shot}_raw"
     # prefix 前缀: gpt-3.5-turbo-16k_True_1
     
-    # Create the path for generation results
+    # (1)Create the path for generation results
     pathname = f"./codes/{prefix}"                  # ./codes/gpt-3.5-turbo-16k_True_1
     if not os.path.exists(pathname):
         os.makedirs(pathname)
        
-    # Create Finetune Logs
+    # (2)Create Finetune Logs
     finetune_dir = f"./codes/{prefix}/finetune_log" # ./codes/gpt-3.5-turbo-16k_True_1/finetune_log
     if not os.path.exists(finetune_dir):
         os.makedirs(finetune_dir)
     
     for task in tasks_to_solve:
         print(f"Processing Task: {task}")
-        tmp_pathname = f"{pathname}/{task}"
+        # (1)Create the path for generation results
+        tmp_pathname = f"{pathname}/{task}"         # ./codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation
         if not os.path.exists(tmp_pathname):
             os.makedirs(tmp_pathname)
-        temp_finetunedir = f"{finetune_dir}/{task}"
+        # (2)Create Finetune Logs
+        temp_finetunedir = f"{finetune_dir}/{task}" # ./codes/gpt-3.5-turbo-16k_False_0/finetune_log/detect-ai-generation
         if not os.path.exists(temp_finetunedir):
             os.makedirs(temp_finetunedir)
         for idx in range(args.trials):
             prompt = get_prompt(task, context_num=args.shot, strategy="retrieval" if args.retrieval else "random", raw=args.raw)
             response = generation(prompt, args.llm, temperature=args.temperature, log_file=f"{temp_finetunedir}/{idx}.txt")
+            # (3)Create Response 文件
             filename = f"{tmp_pathname}/train_{idx}.py"
-            with open(filename, "wt") as file:
+            with open(filename, "wt") as file: # 把提取出来的 python 代码保存到 filename 里面
                 file.write(response)
             
 
