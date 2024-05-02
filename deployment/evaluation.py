@@ -35,7 +35,7 @@ def get_args():
     
     # 修改1: 用.yaml 来更新参数 ========================== 修改：开始 ==========================
     # Load config from config.yaml
-    with open("./config/evaluate_py_config.yaml", "r") as f:
+    with open("./config/2_evaluate_py_config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     # Update args with config
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     for task in tasks_to_evaluate: # ['smoker-status', 'mohs-hardness', 'bitcoin-price-prediction']
         
         # (0) 创建 1个 workspace (i.e, 当前的工作目录，我们这个 evaluation.py 做的实验都会放到这个目录里面)
-        workspace_task_dir = f"./1_workspace/{args.path}/{task}" 
+        workspace_task_dir = f"./2_workspace/{args.path}/{task}" 
         if not os.path.exists(workspace_task_dir):
             os.makedirs(workspace_task_dir)
             
@@ -86,14 +86,14 @@ if __name__ == '__main__':
         if os.path.exists(benchmark_task_env_dir):
             # 把 benchmark_task_env_dir 文件夹中的所有文件 复制到 workspace_task_dir 文件夹中
             shutil.copytree(benchmark_task_env_dir, # ../development/MLAgentBench/benchmarks/detect-ai-generation/env
-                            workspace_task_dir,     # ./1_workspace/gpt-3.5-turbo-16k_False_0/detect-ai-generation
+                            workspace_task_dir,     # ./2_workspace/gpt-3.5-turbo-16k_False_0/detect-ai-generation
                             symlinks=True, 
                             dirs_exist_ok=True
                             )
             
             
         # (2)将 generate.py 生成的代码文件 (xxx/codes/gpt-3.5-turbo-16k_False_0/electricity) 复制到 工作目录 (work_dir) 中
-        task_pycode_dir = f"./codes/{args.path}/generated_codes/{task}"
+        task_pycode_dir = f"./1_codes/{args.path}/generated_codes/{task}"
         if os.path.exists(task_pycode_dir):
             shutil.copytree(task_pycode_dir, workspace_task_dir, symlinks=True, dirs_exist_ok=True)
          # ============= 将指定任务的环境文件 (xxx/benchmarks/electricity/env ) & 代码文件复制到 工作目录 (work_dir) 中 ==============
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         print('workspace_task_dir       =', workspace_task_dir)   # ./workspace/gpt-3.5-turbo-16k_False_0/detect-ai-generation
         print('benchmark_task_dir       =', benchmark_task_dir)    # ../development/MLAgentBench/benchmarks/detect-ai-generation
         print('benchmark_task_env_dir   =', benchmark_task_env_dir)  # ../development/MLAgentBench/benchmarks/detect-ai-generation/env
-        print('task_pycode_dir            =', task_pycode_dir)          # ./codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation
+        print('task_pycode_dir            =', task_pycode_dir)          # ./1_codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation
         print('os.path.exists(workspace_task_dir)     =', os.path.exists(workspace_task_dir)) # False
         print('os.path.exists(benchmark_task_env_dir) =', os.path.exists(benchmark_task_env_dir)) # True
         print('os.path.exists(task_pycode_dir)          =', os.path.exists(task_pycode_dir)) # True
@@ -131,13 +131,13 @@ if __name__ == '__main__':
         print('results =', results) # []
         
         # (4) 创建结果目录 (result path)
-        result_dir = f"./2_results/{args.path}"        
+        result_dir = f"./3_results/{args.path}"        
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
         result_csvfile_path = f"{result_dir}/{task}.csv" 
         print('\n')
-        print('result_dir          =', result_dir)           # ./2_results/gpt-3.5-turbo-16k_False_0
-        print('result_csvfile_path =', result_csvfile_path)  # ./2_results/gpt-3.5-turbo-16k_False_0/smoker-status.csv
+        print('result_dir          =', result_dir)           # ./3_results/gpt-3.5-turbo-16k_False_0
+        print('result_csvfile_path =', result_csvfile_path)  # ./3_results/gpt-3.5-turbo-16k_False_0/smoker-status.csv
 
         # (5) 遍历 args.trials => 开始不停的做实验, 对于每次试验:
         # (5).1 执行训练脚本。
