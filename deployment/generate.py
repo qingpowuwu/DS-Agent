@@ -53,7 +53,7 @@ def get_args():
     
     # 修改3: 用.yaml 来更新参数 ========================== 修改：开始 ==========================
     # Load config from config.yaml
-    with open("./config/generate_py_config.yaml", "r") as f:
+    with open("./config/1_generate_py_config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     # Update args with config
@@ -187,14 +187,14 @@ if __name__ == '__main__':
     print('prefix             = ', prefix) # gpt-3.5-turbo-16k_True_1
     
     # (1) Create the path for gpt 生成的 py 代码: response
-    generate_codes_dir = f"./codes/{prefix}/generated_codes" 
-    print('generate_codes_dir = ', generate_codes_dir) # ./codes/gpt-3.5-turbo-16k_False_0/generated_codes
+    generate_codes_dir = f"./1_codes/{prefix}/generated_codes" 
+    print('generate_codes_dir = ', generate_codes_dir) # ./1_codes/gpt-3.5-turbo-16k_False_0/generated_codes
     if not os.path.exists(generate_codes_dir):
         os.makedirs(generate_codes_dir)
        
     # (2) Create Finetune Logs ansi: prompt 和 response
-    finetune_log_ansi_dir = f"./codes/{prefix}/finetune_log_ansi"
-    print('finetune_log_ansi_dir       = ', finetune_log_ansi_dir) # ./codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi
+    finetune_log_ansi_dir = f"./1_codes/{prefix}/finetune_log_ansi"
+    print('finetune_log_ansi_dir       = ', finetune_log_ansi_dir) # ./1_codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi
     if not os.path.exists(finetune_log_ansi_dir):
         os.makedirs(finetune_log_ansi_dir)
         
@@ -204,10 +204,10 @@ if __name__ == '__main__':
     for task in tasks_to_solve:
         # (1) 创建任务文件夹: i.e, response
         temp_generatedcode_dir = f"{generate_codes_dir}/{task}"    # 当前 llm/task 的路径
-        print('temp_generatedcode_dir = ', temp_generatedcode_dir) # ./codes/gpt-3.5-turbo-16k_False_0/generated_codes/detect-ai-generation
+        print('temp_generatedcode_dir = ', temp_generatedcode_dir) # ./1_codes/gpt-3.5-turbo-16k_False_0/generated_codes/detect-ai-generation
         # (2) 创建微调日志文件夹: i.e, prompt 和 response
         temp_finetunedir       = f"{finetune_log_ansi_dir}/{task}"
-        print('temp_finetunedir       = ', temp_finetunedir)       # ./codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi/detect-ai-generation
+        print('temp_finetunedir       = ', temp_finetunedir)       # ./1_codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi/detect-ai-generation
         if not os.path.exists(temp_generatedcode_dir):
             os.makedirs(temp_generatedcode_dir)
         if not os.path.exists(temp_finetunedir):
@@ -215,15 +215,15 @@ if __name__ == '__main__':
             
 
         print(f"{YELLOW}task          = {YELLOW}{task}{RESET}")     # detect-ai-generation
-        print('temp_generatedcode_dir = ', temp_generatedcode_dir)  # ./codes/gpt-3.5-turbo-16k_True_1/detect-ai-generation
-        print('temp_finetunedir       = ', temp_finetunedir)        # ./codes/gpt-3.5-turbo-16k_True_1/finetune_log_ansi/detect-ai-generation
+        print('temp_generatedcode_dir = ', temp_generatedcode_dir)  # ./1_codes/gpt-3.5-turbo-16k_True_1/detect-ai-generation
+        print('temp_finetunedir       = ', temp_finetunedir)        # ./1_codes/gpt-3.5-turbo-16k_True_1/finetune_log_ansi/detect-ai-generation
 
         print('\n-------------------------------- 开始遍历所有的 trials --------------------------------\n')
 
         for idx in range(args.trials): # 这里的 trial 指的是 重复对话的次数, 目的是 重复实验
             print(f'\n{YELLOW}-------- task: {YELLOW}{task} ----- {task_count}/{len(tasks_to_solve)} -------------------- 正在遍历 trials, 当前为重复第几次对话[idx] = {idx}/{args.trials} ----------------------------{RESET}\n')
             log_file_path_log = f"{temp_finetunedir}/{idx}.ansi"
-            print('log_file_path = ', log_file_path_log) # ./codes/gpt-3.5-turbo-16k_True_1/finetune_log_ansi/detect-ai-generation/0.txt
+            print('log_file_path = ', log_file_path_log) # ./1_codes/gpt-3.5-turbo-16k_True_1/finetune_log_ansi/detect-ai-generation/0.txt
             prompt   = get_prompt(task, 
                                   context_num=args.shot, 
                                   strategy="retrieval" if args.retrieval else "random", 
@@ -232,11 +232,11 @@ if __name__ == '__main__':
             code_extracted = generation(prompt, 
                                   args.llm, 
                                   temperature=args.temperature, 
-                                  log_file_path=log_file_path_log, # ./codes/gpt-3.5-turbo-16k_True_1/finetune_log_ansi/detect-ai-generation/0.txt
+                                  log_file_path=log_file_path_log, # ./1_codes/gpt-3.5-turbo-16k_True_1/finetune_log_ansi/detect-ai-generation/0.txt
                                   max_num_try_calls=50
                                   )
             pycode_extracted_path = f"{temp_generatedcode_dir}/train_{idx}.py"
-            print('filename = ', pycode_extracted_path) # ./codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation/train_0.py
+            print('filename = ', pycode_extracted_path) # ./1_codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation/train_0.py
             with open(pycode_extracted_path, "wt") as file: # 把提取出来的 python 代码保存到 pycode_extracted_path 里面
                 file.write(code_extracted)
             
@@ -257,12 +257,12 @@ print(f'\n{YELLOW}==============================================================
 # 这个 generate_print.py 主要是对 generate.py 的代码 保存的3个文件目录修改了一下，把它们放到了同1个目录:
 
 # generate.py
-    # temp_pathname = f"{pathname}/{task}"                       # ./codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation
+    # temp_pathname = f"{pathname}/{task}"                       # ./1_codes/gpt-3.5-turbo-16k_False_0/detect-ai-generation
         # 这个路径下生成一个 train_{idx}.py 文件,文件内容是 response
         # train_1.py 文件内容是 response
         # train_2.py 文件内容是 response
         # ...
-    # temp_fineturnedir = f"{finetune_dir}/{task}" # ./codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi/detect-ai-generation
+    # temp_fineturnedir = f"{finetune_dir}/{task}" # ./1_codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi/detect-ai-generation
         # 这个路径下生成一个 {idx}.txt 文件,文件内容是 prompt 和 response
         # 1.txt 文件内容是 prompt 和 response
         # 2.txt 文件内容是 prompt 和 response
@@ -275,13 +275,13 @@ print(f'\n{YELLOW}==============================================================
          
 # generate_print.py
     # (1) 创建任务文件夹: i.e, response
-    # temp_generatedcode_dir = f"{generate_codes_dir}/{task}"        # ./codes/gpt-3.5-turbo-16k_False_0/generated_codes/detect-ai-generation
+    # temp_generatedcode_dir = f"{generate_codes_dir}/{task}"        # ./1_codes/gpt-3.5-turbo-16k_False_0/generated_codes/detect-ai-generation
         # 这个路径下生成一个 train_{idx}.py 文件,文件内容是 response
         # train_1.py 文件内容是 response
         # train_2.py 文件内容是 response
         # ...
     # (2) 创建微调日志文件夹: i.e, prompt 和 response
-    # temp_finetunedir       = f"{finetune_dir}/{task}"              # ./codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi/detect-ai-generation
+    # temp_finetunedir       = f"{finetune_dir}/{task}"              # ./1_codes/gpt-3.5-turbo-16k_False_0/finetune_log_ansi/detect-ai-generation
         # 这个路径下生成一个 {idx}.txt 文件,文件内容是 prompt 和 response
         # 1.txt 文件内容是 prompt 和 response
         # 2.txt 文件内容是 prompt 和 response
